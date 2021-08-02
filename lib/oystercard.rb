@@ -2,7 +2,7 @@ class Oystercard
   
   INITIAL_BALANCE = 0
   TOP_UP_LIMIT = 90
-  attr_reader :balance, :in_use
+  attr_reader :balance
 
   def initialize 
     @balance = INITIAL_BALANCE
@@ -24,6 +24,10 @@ class Oystercard
 
   def touch_out
     @in_use = false
+  end
+
+  def in_journey?
+    @in_use
   end
 
   private

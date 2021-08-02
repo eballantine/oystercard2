@@ -36,7 +36,7 @@ describe Oystercard do
   describe '#touch_in' do
     
     it "changes @in_use to true when touched in" do
-      expect { subject.touch_in }.to change { subject.in_use }.from(false).to(true)
+      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
     end
 
   end
@@ -45,8 +45,20 @@ describe Oystercard do
 
 		it "changes @in_use to be false when touched out" do
 			subject.touch_in
-	  	expect { subject.touch_out }.to change { subject.in_use }.from(true).to(false)
+	  	expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
 		end
 	end
+
+  describe '#in_journey?' do
+  
+    it "checks to see if the card is being used when user hasn't touched in" do
+      expect(subject.in_journey?).to be false
+    end
+
+    it "checks to see if the card being used when user has touched in" do
+      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+    end
+
+  end
 
 end
