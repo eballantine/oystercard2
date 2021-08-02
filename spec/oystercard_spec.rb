@@ -30,6 +30,15 @@ describe Oystercard do
 			subject.top_up(10)
 			expect { subject.deduct(10) }.to change { subject.balance }.from(10).to(0)
 		end
-	end
+	
+  end
+
+  describe '#touch_in' do
+    
+    it "changes @in_use to true when touched in" do
+      expect { subject.touch_in }.to change { subject.in_use }.from(false).to(true)
+    end
+
+  end
 
 end
