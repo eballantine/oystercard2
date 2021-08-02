@@ -41,4 +41,12 @@ describe Oystercard do
 
   end
 
+	describe '#touch_out' do
+
+		it "changes @in_use to be false when touched out" do
+			subject.touch_in
+	  	expect { subject.touch_out }.to change { subject.in_use }.from(true).to(false)
+		end
+	end
+
 end
