@@ -24,4 +24,12 @@ describe Oystercard do
 
   end
 
+	describe '#deduct' do
+		
+		it "deducts the fare from the card" do
+			subject.top_up(10)
+			expect { subject.deduct(10) }.to change { subject.balance }.from(10).to(0)
+		end
+	end
+
 end
