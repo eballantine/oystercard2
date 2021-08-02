@@ -36,14 +36,20 @@ describe Oystercard do
   describe '#touch_in' do
     
     it "changes @in_use to true when touched in" do
+			subject.top_up(10)
       expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
     end
+
+		it "raises an error if card balance less than minimum amount" do
+			expect { subject.touch_in }.to raise_error "Insufficient funds"
+		end
 
   end
 
 	describe '#touch_out' do
 
 		it "changes @in_use to be false when touched out" do
+			subject.top_up(10)
 			subject.touch_in
 	  	expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
 		end
@@ -56,6 +62,7 @@ describe Oystercard do
     end
 
     it "checks to see if the card being used when user has touched in" do
+			subject.top_up(10)
       expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
     end
 
