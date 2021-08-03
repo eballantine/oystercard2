@@ -24,48 +24,57 @@ describe Oystercard do
 
   end
 
-	describe '#deduct' do
+  context "When topped up by £10" do
+
+    before(:each) do
+      subject.top_up(10)
+    end
+	  describe '#deduct' do
 		
-		it "deducts the fare from the card" do
-			subject.top_up(10)
-			expect { subject.deduct(10) }.to change { subject.balance }.from(10).to(0)
-		end
-	
-  end
-
-  describe '#touch_in' do
+      it "deducts the fare from the card" do
+        expect { subject.send(:deduct, 10) }.to change { subject.balance }.from(10).to(0)
+      end
     
-    it "changes @in_use to true when touched in" do
-			subject.top_up(10)
-      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
     end
 
-		it "raises an error if card balance less than minimum amount" do
-			expect { subject.touch_in }.to raise_error "Insufficient funds"
-		end
+    describe '#touch_in' do
+      
+      it "changes @in_use to true when touched in" do
+        expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+      end
 
-  end
+      it "raises an error if card balance less than minimum amount" do
+        subject = described_class.new
+        expect { subject.touch_in }.to raise_error "Insufficient funds"
+      end
 
-	describe '#touch_out' do
-
-		it "changes @in_use to be false when touched out" do
-			subject.top_up(10)
-			subject.touch_in
-	  	expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
-		end
-	end
-
-  describe '#in_journey?' do
-  
-    it "checks to see if the card is being used when user hasn't touched in" do
-      expect(subject.in_journey?).to be false
     end
 
-    it "checks to see if the card being used when user has touched in" do
-			subject.top_up(10)
-      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+    describe '#touch_out' do
+
+      it "changes @in_use to be false when touched out" do
+        subject.touch_in
+        expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
+      end
+
+      it "deducts the minimum fare when touched out" do
+        subject.touch_in
+        expect { subject.touch_out }.to change { subject.balance }.by(-(Oystercard::MINIMUM_FARE))
+      end
+
     end
 
+    describe '#in_journey?' do
+    
+      it "checks to see if the card is being used when user hasn't touched in" do
+        expect(subject.in_journey?).to be false
+      end
+
+      it "checks to see if the card being used when user has touched in" do
+        expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+      end
+
+    end
   end
 
 end
