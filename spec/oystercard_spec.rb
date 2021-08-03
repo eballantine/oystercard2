@@ -1,13 +1,17 @@
 require 'oystercard'
 
 describe Oystercard do
+  let(:station) { double('station') }
 
-  describe '#balance' do
+  describe '#initialize' do
 
 	  it "gives an initial balance of 0" do
     	expect(subject.balance).to eq 0
 	  end
 
+    it "can record an entry station" do
+      expect(subject).to have_attributes(:entry_station => nil)
+    end
   end
 
   describe '#top_up' do
@@ -38,30 +42,38 @@ describe Oystercard do
     end
 
     describe '#touch_in' do
-      
       it "changes @in_use to true when touched in" do
-        expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+        expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
       end
 
       it "raises an error if card balance less than minimum amount" do
         subject = described_class.new
-        expect { subject.touch_in }.to raise_error "Insufficient funds"
+        expect { subject.touch_in(station) }.to raise_error "Insufficient funds"
       end
 
+      it "records the entry station" do
+        subject.touch_in(station)
+        expect(subject.entry_station).to eq station
+      end
     end
 
     describe '#touch_out' do
 
       it "changes @in_use to be false when touched out" do
-        subject.touch_in
+        subject.touch_in(station)
         expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
       end
 
       it "deducts the minimum fare when touched out" do
-        subject.touch_in
+        subject.touch_in(station)
         expect { subject.touch_out }.to change { subject.balance }.by(-(Oystercard::MINIMUM_FARE))
       end
 
+      it "forgets the entry station" do
+        subject.touch_in(station)
+        subject.touch_out
+        expect(subject.entry_station).to be_nil
+      end
     end
 
     describe '#in_journey?' do
@@ -71,10 +83,8 @@ describe Oystercard do
       end
 
       it "checks to see if the card being used when user has touched in" do
-        expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+        expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
       end
-
     end
   end
-
 end
