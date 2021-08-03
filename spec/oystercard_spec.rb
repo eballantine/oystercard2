@@ -42,7 +42,7 @@ describe Oystercard do
     end
 
     describe '#touch_in' do
-      it "changes @in_use to true when touched in" do
+      it "records that the card is in a journey" do
         expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
       end
 
@@ -59,7 +59,7 @@ describe Oystercard do
 
     describe '#touch_out' do
 
-      it "changes @in_use to be false when touched out" do
+      it "records that the card has finished a journey" do
         subject.touch_in(station)
         expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
       end
