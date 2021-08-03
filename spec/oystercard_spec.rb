@@ -12,6 +12,14 @@ describe Oystercard do
     it "can record an entry station" do
       expect(subject).to have_attributes(:entry_station => nil)
     end
+
+    it "can record an exit station" do
+      expect(subject).to have_attributes(:exit_station => nil)
+    end
+
+    it "can record journeys" do
+      expect(subject).to have_attributes(:journeys => [])
+    end
   end
 
   describe '#top_up' do
@@ -61,19 +69,37 @@ describe Oystercard do
 
       it "records that the card has finished a journey" do
         subject.touch_in(station)
-        expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
+        expect { subject.touch_out(station) }.to change { subject.in_journey? }.from(true).to(false)
       end
 
       it "deducts the minimum fare when touched out" do
         subject.touch_in(station)
-        expect { subject.touch_out }.to change { subject.balance }.by(-(Oystercard::MINIMUM_FARE))
+        expect { subject.touch_out(station) }.to change { subject.balance }.by(-(Oystercard::MINIMUM_FARE))
       end
 
       it "forgets the entry station" do
         subject.touch_in(station)
-        subject.touch_out
+        subject.touch_out(station)
         expect(subject.entry_station).to be_nil
       end
+
+      it "records the exit station" do
+        subject.touch_in(station)
+        subject.touch_out(station)
+        expect(subject.exit_station).to eq station
+      end
+
+      it "stores a completed journey" do
+        subject.touch_in(station)
+        expect { subject.touch_out(station) }.to change { subject.journeys.length }.by(+1) 
+      end
+
+      it "stores the correct entry and exit station for a journey" do
+        subject.touch_in(station)
+        subject.touch_out(station)
+        expect(subject.journeys).to include({:entry_station => station, :exit_station => station})
+      end
+
     end
 
     describe '#in_journey?' do
