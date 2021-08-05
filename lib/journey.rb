@@ -12,7 +12,7 @@ class Journey
   end
 
   def finish_journey(f)
-    (@journey.empty?) ? @journey << { start: nil, finish: f } : (@journey.last[:finish] = f)
+    @journey.empty? ? @journey << { start: nil, fin: f } : @journey.last[:fin] = f
   end
   # complete a journey
 

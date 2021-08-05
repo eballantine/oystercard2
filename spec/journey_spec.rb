@@ -22,12 +22,12 @@ describe Journey do
     it "should record exit station in journey" do
       subject.start_journey('Mayfair')
       subject.finish_journey('Chiswick')
-      expect(subject.journey).to eq([{:start => 'Mayfair', :finish => 'Chiswick'}])
+      expect(subject.journey).to eq([{:start => 'Mayfair', :fin => 'Chiswick'}])
     end
 
     it "should record a journey when only given an exit station" do
       subject.finish_journey('Green Park')
-      expect(subject.journey).to eq([{:start => nil, :finish => 'Green Park'}])
+      expect(subject.journey).to eq([{:start => nil, :fin => 'Green Park'}])
     end
 
     it "should record a journey when only given an entry station" do
