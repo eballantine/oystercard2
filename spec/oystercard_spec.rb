@@ -8,18 +8,6 @@ describe Oystercard do
 	  it "gives an initial balance of 0" do
     	expect(subject.balance).to eq 0
 	  end
-
-    it "can record an entry station" do
-      expect(subject).to have_attributes(:entry_station => nil)
-    end
-
-    it "can record an exit station" do
-      expect(subject).to have_attributes(:exit_station => nil)
-    end
-
-    it "can record journeys" do
-      expect(subject).to have_attributes(:journeys => [])
-    end
   end
 
   describe '#top_up' do
@@ -33,7 +21,6 @@ describe Oystercard do
       error_message = "Maximum top up (£#{top_up_limit}) exceeded"
       expect { subject.top_up(top_up_limit+1) }.to raise_error error_message
     end
-
   end
 
   context "When topped up by £10" do
@@ -41,8 +28,8 @@ describe Oystercard do
     before(:each) do
       subject.top_up(10)
     end
+
 	  describe '#deduct' do
-		
       it "deducts the fare from the card" do
         expect { subject.send(:deduct, 10) }.to change { subject.balance }.from(10).to(0)
       end
@@ -66,7 +53,6 @@ describe Oystercard do
     end
 
     describe '#touch_out' do
-
       it "records that the card has finished a journey" do
         subject.touch_in(station)
         expect { subject.touch_out(station) }.to change { subject.in_journey? }.from(true).to(false)
@@ -99,11 +85,9 @@ describe Oystercard do
         subject.touch_out(station)
         expect(subject.journeys).to include({:entry_station => station, :exit_station => station})
       end
-
     end
 
     describe '#in_journey?' do
-    
       it "checks to see if the card is being used when user hasn't touched in" do
         expect(subject.in_journey?).to be false
       end

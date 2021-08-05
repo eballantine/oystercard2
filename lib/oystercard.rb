@@ -10,7 +10,7 @@ class Oystercard
     @balance = INITIAL_BALANCE
     @entry_station
     @exit_station
-    @journeys = []
+    @journey_history = []
   end
 
   def top_up(amount)
