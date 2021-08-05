@@ -1,19 +1,20 @@
 class Journey
-  attr_reader :entry_station, :exit_station, :journey
+  attr_reader :journey
 
-  def initialize(entry_station = nil, exit_station = nil)
-    @entry_station = entry_station
-    @exit_station = exit_station
+  def initialize
     @journey = []
   end
 
   def start_journey(s)
-    @journey << { :start => s }
+    save_to_card unless @journey.empty? 
+    @journey = [{ start: s }]
   end
 
   def finish_journey(f)
     @journey.empty? ? @journey << { start: nil, fin: f } : @journey.last[:fin] = f
   end
-  # complete a journey
 
+  def save_to_card(card)
+    card.journey_history << @journey
+  end
 end

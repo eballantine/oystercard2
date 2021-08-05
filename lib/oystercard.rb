@@ -4,12 +4,12 @@ class Oystercard
   TOP_UP_LIMIT = 90
   MINIMUM_FARE = 1
 
-  attr_reader :balance, :entry_station, :exit_station, :journeys
+  attr_reader :balance, :entry_station, :exit_station
+  attr_accessor :journey_history
 
   def initialize 
     @balance = INITIAL_BALANCE
-    @entry_station
-    @exit_station
+    @journey = Journey.new
     @journey_history = []
   end
 
