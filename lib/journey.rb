@@ -7,6 +7,13 @@ class Journey
     @journey = []
   end
 
+  def start_journey(s)
+    @journey << { :start => s }
+  end
+
+  def finish_journey(f)
+    (@journey.empty?) ? @journey << { start: nil, finish: f } : (@journey.last[:finish] = f)
+  end
   # complete a journey
 
 end

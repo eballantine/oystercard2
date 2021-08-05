@@ -14,14 +14,26 @@ describe Journey do
       expect(subject).to have_attributes(:journey => [])
     end
     
-    it "should record a journey when only given an exit station" do
-      test_journey = described_class.new(exit_station: "Kings Cross")
-      expect(test_journey.journey).to eq [entry_station: nil, exit_station: "Kings Cross"]
+    it "should record entry station in journey" do
+      subject.start_journey('Mayfair')
+      expect(subject.journey).to eq([{:start => 'Mayfair'}])
     end
 
-    it "should record a journey when given an entry and exit station" do
+    it "should record exit station in journey" do
+      subject.start_journey('Mayfair')
+      subject.finish_journey('Chiswick')
+      expect(subject.journey).to eq([{:start => 'Mayfair', :finish => 'Chiswick'}])
+    end
+
+    it "should record a journey when only given an exit station" do
+      subject.finish_journey('Green Park')
+      expect(subject.journey).to eq([{:start => nil, :finish => 'Green Park'}])
+    end
+
+    it "should record a journey when only given an entry station" do
       
     end
+
   end
 
 end
