@@ -25,7 +25,7 @@ describe Oystercard do
 
   context "When topped up by £10" do
 
-    before(:each) do
+    before do
       subject.top_up(10)
     end
 
@@ -37,70 +37,58 @@ describe Oystercard do
     end
 
     describe '#touch_in' do
-      it "records that the card is in a journey" do
-        expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
-      end
-
       it "raises an error if card balance less than minimum amount" do
         subject = described_class.new
-        expect { subject.touch_in(station) }.to raise_error "Insufficient funds"
+        expect{ subject.touch_in(station) }.to raise_error "Insufficient funds"
       end
 
-      it "records the entry station" do
-        subject.touch_in(station)
-        expect(subject.entry_station).to eq station
+      it "starts a new journey" do
+        expect(subject).to respond_to(:touch_in)
+      end
+
+      context "last journey failed to touch out" do
+        before do 
+          subject.touch_in("Oxford Street")
+        end
+
+        it "deducts a penalty fare" do
+          expect{ subject.touch_in("Chiswick Park") }.to change { subject.balance }.by(-(Oystercard::PENALTY_FARE))
+        end
+
+        it "should record the last journey" do
+          subject.touch_in("Chiswick Park")
+          expect(subject.journey_history.last).to eq([{:entry_station => "Oxford Street", :exit_station => nil}])
+        end
       end
     end
 
     describe '#touch_out' do
-      it "records that the card has finished a journey" do
-        subject.touch_in(station)
-        expect { subject.touch_out(station) }.to change { subject.check_journey? }.from(true).to(false)
-      end
-
       it "deducts the minimum fare when touched out" do
         subject.touch_in(station)
         expect { subject.touch_out(station) }.to change { subject.balance }.by(-(Oystercard::MINIMUM_FARE))
       end
 
-      it "forgets the entry station" do
-        subject.touch_in(station)
-        subject.touch_out(station)
-        expect(subject.entry_station).to be_nil
-      end
-
-      it "records the exit station" do
-        subject.touch_in(station)
-        subject.touch_out(station)
-        expect(subject.exit_station).to eq station
-      end
-
       it "stores a completed journey" do
         subject.touch_in(station)
-        expect { subject.touch_out(station) }.to change { subject.journeys.length }.by(+1) 
+        expect { subject.touch_out(station) }.to change { subject.journey_history.length }.by(1) 
       end
 
-      it "stores the correct entry and exit station for a journey" do
-        subject.touch_in(station)
-        subject.touch_out(station)
-        expect(subject.journeys).to include({:entry_station => station, :exit_station => station})
+      context "user didn't touch in" do
+        it "deducts the penalty fare" do
+          subject.touch_out("Borough")
+          expect{ subject.touch_out("Chiswick Park") }.to change { subject.balance }.by(-(Oystercard::PENALTY_FARE))
+        end
       end
     end
 
-    describe '#in_journey?' do
+    describe '#check_journey?' do
       it "checks to see if the card is being used when user hasn't touched in" do
-        expect(subject.in_journey?).to be false
+        expect(subject.check_journey?).to be false
       end
 
       it "checks to see if the card being used when user has touched in" do
-        expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
+        expect { subject.touch_in(station) }.to change { subject.check_journey? }.from(false).to(true)
       end
     end
-
-     # it "should record a journey to oystercard with only an entry station" do
-      #   subject.start_journey('Mayfair')
-      #   subject.start_journey('Borough')
-      #   expect(oystercard.journey_history.last).to eq({:entry_station => 'Mayfair', :exit_station => nil})
-      # end
   end
 end
