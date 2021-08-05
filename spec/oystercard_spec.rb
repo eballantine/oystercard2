@@ -55,7 +55,7 @@ describe Oystercard do
     describe '#touch_out' do
       it "records that the card has finished a journey" do
         subject.touch_in(station)
-        expect { subject.touch_out(station) }.to change { subject.in_journey? }.from(true).to(false)
+        expect { subject.touch_out(station) }.to change { subject.check_journey? }.from(true).to(false)
       end
 
       it "deducts the minimum fare when touched out" do
@@ -96,5 +96,11 @@ describe Oystercard do
         expect { subject.touch_in(station) }.to change { subject.in_journey? }.from(false).to(true)
       end
     end
+
+     # it "should record a journey to oystercard with only an entry station" do
+      #   subject.start_journey('Mayfair')
+      #   subject.start_journey('Borough')
+      #   expect(oystercard.journey_history.last).to eq({:entry_station => 'Mayfair', :exit_station => nil})
+      # end
   end
 end

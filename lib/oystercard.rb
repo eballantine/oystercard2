@@ -6,7 +6,7 @@ class Oystercard
   TOP_UP_LIMIT = 90
   MINIMUM_FARE = 1
 
-  attr_reader :balance
+  attr_reader :balance, :journey
   attr_accessor :journey_history
 
   def initialize
@@ -22,29 +22,26 @@ class Oystercard
 
   def touch_in(station)
     raise "Insufficient funds" if @balance < MINIMUM_FARE
-    @journey_history << @journey if @journey.entry_station != nil
-    @joruney
+    @journey_history << @journey.journey if @journey.entry_station != nil
+    reset_journey
     @journey.start_journey(station)
-
-    end
-    # if it has entry but no exit
-    # chech journey if exit station is not nil
-    # save full journey in JH and start new one
-    
   end
 
   def touch_out(station)
-    deduct(MINIMUM_FARE)
-    # @exit_station = station
-    # @journeys << {:entry_station => @entry_station, :exit_station => @exit_station}
+    @journey.exit_station != nil ? deduct(PENALTY_FARE) : deduct(MINIMUM_FARE)
+    @journey_history << @journey.journey
     @journey.finish_journey(station)
+    reset_journey
+  end
+
+  def check_journey?
+    @journey.in_journey?
   end
 
   private
 
   def reset_journey
-    @journey.entry_station = nil
-    @journey.entry_station = nil
+    @journey = Journey.new
   end
 
   def exceed_top_up?(amount, balance)

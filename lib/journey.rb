@@ -4,22 +4,19 @@ class Journey
   attr_reader :journey, :entry_station, :exit_station
 
   def initialize
-    @journey = []
+    @journey = [{entry_station: nil, exit_station: nil}]
     @entry_station = nil
     @exit_station = nil
   end
 
   def start_journey(s)
-    save_to_card unless @journey.empty? 
-    @journey = [{ start: s }]
+    @journey.last[:entry_station] = s
+    @entry_station = s
   end
 
   def finish_journey(f)
-    @journey.empty? ? @journey << { start: nil, fin: f } : @journey.last[:fin] = f
-  end
-
-  def save_to_card(card)
-    card.journey_history << @journey
+    @journey.last[:exit_station] = f
+    @exit_station = f
   end
 
   def in_journey?
