@@ -49,7 +49,8 @@ class Oystercard
   end
 
   def fare
-    if @current_journey.status[:exit_station] != "None recorded" && @current_journey.status[:entry_station] == "None recorded"
+    if @current_journey.status[:exit_station] != "None recorded" && 
+      @current_journey.status[:entry_station] == "None recorded"
       PENALTY_FARE
     else 
       MINIMUM_FARE 

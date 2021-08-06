@@ -13,7 +13,7 @@ class Journey
   end
 
   def finish_journey(station)
-    @journey_history << @status if forgot_to_tap_in?
+    # @journey_history << @status if forgot_to_tap_in?
     @status[:exit_station] = station
   end
 
@@ -23,10 +23,5 @@ class Journey
 
   def forgot_to_tap_out?
     @status[:exit_station] == "None recorded" && @status[:entry_station] != "None recorded"
-  end
-
-  def forgot_to_tap_in?
-    @status[:entry_station] == "None recorded" &&
-      @status[:exit_station] != "None recorded"
   end
 end
