@@ -1,25 +1,32 @@
-require_relative 'oystercard'
-
 class Journey
-  attr_reader :journey, :entry_station, :exit_station
+  attr_reader :status
 
   def initialize
-    @journey = [{entry_station: nil, exit_station: nil}]
-    @entry_station = nil
-    @exit_station = nil
+    @status = {
+      entry_station: "None recorded", 
+      exit_station: "None recorded" 
+    }
   end
 
-  def start_journey(s)
-    @journey.last[:entry_station] = s
-    @entry_station = s
+  def start_journey(station)
+    @status[:entry_station] = station
   end
 
-  def finish_journey(f)
-    @journey.last[:exit_station] = f
-    @exit_station = f
+  def finish_journey(station)
+    @journey_history << @status if forgot_to_tap_in?
+    @status[:exit_station] = station
   end
 
   def in_journey?
-    @entry_station != nil
+    @status[:entry_station] != "None recorded"
+  end
+
+  def forgot_to_tap_out?
+    @status[:exit_station] == "None recorded" && @status[:entry_station] != "None recorded"
+  end
+
+  def forgot_to_tap_in?
+    @status[:entry_station] == "None recorded" &&
+      @status[:exit_station] != "None recorded"
   end
 end

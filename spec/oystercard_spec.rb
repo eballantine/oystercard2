@@ -33,7 +33,6 @@ describe Oystercard do
       it "deducts the fare from the card" do
         expect { subject.send(:deduct, 10) }.to change { subject.balance }.from(10).to(0)
       end
-    
     end
 
     describe '#touch_in' do
@@ -57,7 +56,7 @@ describe Oystercard do
 
         it "should record the last journey" do
           subject.touch_in("Chiswick Park")
-          expect(subject.journey_history.last).to eq([{:entry_station => "Oxford Street", :exit_station => nil}])
+          expect(subject.journey_history.last).to eq({:entry_station => "Oxford Street", :exit_station => "None recorded"})
         end
       end
     end
@@ -82,12 +81,15 @@ describe Oystercard do
     end
 
     describe '#check_journey?' do
-      it "checks to see if the card is being used when user hasn't touched in" do
-        expect(subject.check_journey?).to be false
+      context "not tapped in" do
+        it "should confirm card is not in use" do
+          expect(subject.check_journey?).to be false
+        end
       end
-
-      it "checks to see if the card being used when user has touched in" do
-        expect { subject.touch_in(station) }.to change { subject.check_journey? }.from(false).to(true)
+      context "tapped in, not yet tapped out" do
+        it "should confirm the card is in use" do
+          expect { subject.touch_in(station) }.to change { subject.check_journey? }.from(false).to(true)
+        end
       end
     end
   end

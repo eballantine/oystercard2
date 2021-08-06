@@ -1,5 +1,3 @@
-require_relative 'journey'
-
 class Oystercard
   
   INITIAL_BALANCE = 0
@@ -7,59 +5,40 @@ class Oystercard
   MINIMUM_FARE = 1
   PENALTY_FARE = 6
 
-  attr_reader :balance, :journey
+  attr_reader :balance, :current_journey
   attr_accessor :journey_history
 
   def initialize
     @balance = INITIAL_BALANCE
-    @journey = Journey.new
     @journey_history = []
+    @current_journey = Journey.new
   end
 
   def top_up(amount)
     raise "Maximum top up (£#{TOP_UP_LIMIT}) exceeded" if exceed_top_up?(amount,balance)
+    
     @balance += amount
   end
 
   def touch_in(station)
     raise "Insufficient funds" if @balance < MINIMUM_FARE
-    if @journey.entry_station != nil
-      @journey_history << @journey.journey 
-      # @balance -= PENALTY_FARE
-    end
-    reset_journey
-    @journey.start_journey(station)
+
+    failed_to_tap_out if @current_journey.forgot_to_tap_out?
+    current_journey.start_journey(station)
   end
 
   def touch_out(station)
-    @journey_history << @journey.journey
+    @current_journey.finish_journey(station)
     deduct(fare)
-    reset_journey
-    @journey.finish_journey(station)
+    @journey_history << @current_journey.status
+    @current_journey = Journey.new
   end
 
   def check_journey?
-    @journey.in_journey?
+    @current_journey.in_journey?
   end
 
   private
-
-  def fare
-    if @journey.exit_station != nil && @journey.exit_station != nil 
-      MINIMUM_FARE
-    else PENALTY_FARE
-    end
-    # if s & f != nil -> deduct min fare
-    # else penalty fare
-    # it checks if journey 
-    # retruns current fare 
-    # deduct(PENALTY_FARE
-    # @journey.exit_station != nil ? deduct(PENALTY_FARE) : deduct(MINIMUM_FARE)
-  end
-
-  def reset_journey
-    @journey = Journey.new
-  end
 
   def exceed_top_up?(amount, balance)
     (balance += amount) > TOP_UP_LIMIT
@@ -67,5 +46,19 @@ class Oystercard
 
   def deduct(amount)
     @balance -= amount
+  end
+
+  def fare
+    if @current_journey.status[:exit_station] != "None recorded" && @current_journey.status[:entry_station] == "None recorded"
+      PENALTY_FARE
+    else 
+      MINIMUM_FARE 
+    end
+  end
+
+  def failed_to_tap_out 
+    deduct(PENALTY_FARE)
+    @journey_history << @current_journey.status 
+    @current_journey = Journey.new
   end
 end
